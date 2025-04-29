@@ -1,8 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { v4 } from 'uuid';
-import { VectorType } from 'pgvector/mikro-orm';
+import { DocumentChunk } from './document-chunk.entity';
 
 export type Vector = number[];
 
@@ -11,11 +15,35 @@ export class Document {
   @PrimaryKey()
   uuid = v4();
 
-  @Property({ type: 'text' })
-  content: string;
+  @Property()
+  numPages: number;
 
-  @Property({ type: VectorType })
-  embedding: Vector;
+  @Property({ nullable: true })
+  title?: string;
+
+  @Property({ nullable: true })
+  author?: string;
+
+  @Property({ nullable: true })
+  subject?: string;
+
+  @Property({ nullable: true })
+  keywords?: string;
+
+  @Property({ nullable: true })
+  producer?: string;
+
+  @Property({ nullable: true })
+  creationDate?: string;
+
+  @Property({ nullable: true })
+  creator?: string;
+
+  @Property({ nullable: true })
+  modDateDate?: string;
+
+  @OneToMany(() => DocumentChunk, (chunk) => chunk.document)
+  chunks = new Collection<DocumentChunk>(this);
 
   @Property({ defaultRaw: 'now()' })
   createdAt?: Date;

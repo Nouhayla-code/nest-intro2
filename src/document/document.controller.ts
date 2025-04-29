@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -16,17 +17,35 @@ export class DocumentController {
     return await this.documentService.findAll();
   }
 
+  @Get('similarity')
+  async getSimilarity(@Body() body: { prompt: string }) {
+    const similarDocs =
+      await this.documentService.retrieveSimilarDocumentChunks(body.prompt);
+    return this.documentService.rerankWithCohere(body.prompt, similarDocs);
+  }
+
   @Get('to-vector')
   async toVector() {
     const text = 'What is the capital of France?';
-    const embedding = await this.documentService.getEmbedding(text);
+    const embedding = await this.documentService.generateEmbedding(text);
     return embedding;
   }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async ugenerateAnsweradFile(@UploadedFile() file: Express.Multer.File) {
     console.log('controller', file);
-    await this.documentService.readFile(file);
+    await this.documentService.processPdf(file);
   }
+
+  // @Post('ask')
+  // async ask(@Body() body: { prompt: string }) {
+  //   const similarDocs =
+  //     await this.documentService.retrieveSimilarDocumentChunks(body.prompt);
+  //   const rerankedResults = await this.documentService.rerankWithCohere(
+  //     body.prompt,
+  //     similarDocs,
+  //   );
+  //   return this.documentService.generateAnswer(body.prompt, rerankedResults);
+  // }
 }
