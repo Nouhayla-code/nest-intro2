@@ -7,7 +7,7 @@ import { Document } from './entities/document.entity';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Vector } from './entities/document.entity';
-import { RagService } from 'src/rag/rag.service';
+import { CohereRerankResponse, RagService } from 'src/rag/rag.service';
 import * as pdfParse from 'pdf-parse';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { DocumentChunk } from './entities/document-chunk.entity';
@@ -94,6 +94,13 @@ export class DocumentService {
     const document = this.documentRepository.create(pdf);
     await this.documentRepository.getEntityManager().persistAndFlush(document);
     return document;
+  }
+
+  async generateResponse(
+    prompt: string,
+    relevantChunks: CohereRerankResponse[],
+  ): Promise<string> {
+    return await this.ragService.generateResponse(prompt, relevantChunks);
   }
 
   async findSimilar(

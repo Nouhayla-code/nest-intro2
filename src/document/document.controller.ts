@@ -21,7 +21,12 @@ export class DocumentController {
   async getSimilarity(@Body() body: { prompt: string }) {
     const similarDocs =
       await this.documentService.retrieveSimilarDocumentChunks(body.prompt);
-    return this.documentService.rerankWithCohere(body.prompt, similarDocs);
+    const rerankedResults = await this.documentService.rerankWithCohere(
+      body.prompt,
+      similarDocs,
+    );
+    return this.documentService.generateResponse(body.prompt, rerankedResults);
+    // return this.documentService.rerankWithCohere(body.prompt, similarDocs);
   }
 
   @Get('to-vector')
