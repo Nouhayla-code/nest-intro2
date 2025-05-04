@@ -51,7 +51,7 @@ export class RagService {
 
     const sortedChunks: CohereRerankResponse[] = rerankedResults.results.map(
       (result) => ({
-        text: docsForCohere[result.index],
+        text: documentChunks[result.index].content,
         relevanceScore: result.relevanceScore,
         index: result.index,
       }),
